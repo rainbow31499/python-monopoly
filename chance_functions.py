@@ -1,6 +1,6 @@
 # This module stores the data for the Chance cards and functions
 
-from property_data import Land, BOARD
+from property_data import Land
 from random import randint
 
 class ChanceCard:
@@ -31,9 +31,9 @@ def CH4(player): # Advance to nearest utility. If unowned, you may buy it from t
         print('You passed Go. Collect $200')
     
     player.square = (player.square + spaces) % 40
-    print('You landed on {}'.format(player.get_position()))
+    print('You landed on {}'.format(player.get_position().name))
     
-    prop = BOARD[player.square]
+    prop = player.game.board[player.square]
     owner = prop.owner
     
     if owner == player.no:
@@ -44,7 +44,7 @@ def CH4(player): # Advance to nearest utility. If unowned, you may buy it from t
         total = d1 + d2
         rent = total * 10
         print('You rolled a {} and owe Player {} ${} for {}'.format(total,owner+1,rent,prop.name))
-        player.payments.append((owner,rent))
+        player.pay_player(owner,rent)
     else:
         player.action()
     
@@ -56,9 +56,9 @@ def CH5(player): # Advance to nearest railroad and pay owner twice the rental. I
         print('You passed Go. Collect $200')
     
     player.square = (player.square + spaces) % 40
-    print('You landed on {}'.format(player.get_position()))
+    print('You landed on {}'.format(player.get_position().name))
     
-    prop = BOARD[player.square]
+    prop = player.game.board[player.square]
     owner = prop.owner
     
     if owner == player.no:
@@ -66,7 +66,7 @@ def CH5(player): # Advance to nearest railroad and pay owner twice the rental. I
     elif owner != None:
         rent = prop.get_rent() * 2
         print('You owe Player {} ${} for {}'.format(owner+1,rent,prop.name))
-        player.payments.append((owner,rent))
+        player.pay_player(owner,rent)
     else:
         player.action()
 
@@ -75,6 +75,7 @@ def CH6(player): # Bank pays you a dividend of $50
 
 def CH7(player): # Get Out Of Jail Free Card - May be kept until needed or sold/traded
     player.get_out_of_jail_free_chance = True
+    player.game.get_out_of_jail_free_chance = player.no
 
 def CH8(player): # Go back 3 spaces
     player.move(-3)
@@ -85,8 +86,8 @@ def CH9(player): # Go to Jail. Go directly to Jail. Do not pass Go, Do not colle
 def CH10(player): # Make general repairs on your property: For each house pay $25, for each hotel $100
     total = 0
     for prop in player.owned_props:
-        if isinstance(BOARD[prop], Land):
-            x = BOARD[prop].houses
+        if isinstance(player.game.board[prop], Land):
+            x = player.game.board[prop].houses
             if x == 5:
                 total += 100
             else:
@@ -108,7 +109,8 @@ def CH13(player): # Take a walk on the Boardwalk. Advance to Boardwalk
     player.move(spaces)
 
 def CH14(player): # You have been elected chairman of the board. Pay each player $50
-    player.payments.append(('all',50))
+    for x in range(player.game.no_of_players):
+        player.pay_player(x,50)
 
 def CH15(player): # Your building loan matures. Collect $150
     player.cash += 150

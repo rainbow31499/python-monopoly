@@ -23,12 +23,14 @@ def CC4(player): # From sale of stock you get $50
 
 def CC5(player): # Get Out Of Jail Free Card - May be kept until needed or sold/traded
     player.get_out_of_jail_free_chest = True
+    player.game.get_out_of_jail_free_chest = player.no
 
 def CC6(player): # Go to Jail. Go directly to Jail. Do not pass Go, Do not collect $200
     player.go_to_jail()
 
 def CC7(player): # Grand Opera Night. Collect $50 from every player for opening night seats
-    player.payments.append(('all',-50))
+    for x in range(player.game.no_of_players):
+        player.pay_player(x,-50)
 
 def CC8(player): # Holiday Fund matures. Collect $100
     player.cash += 100

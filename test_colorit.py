@@ -1,8 +1,8 @@
-import sys
-sys.path.append('C:\\ProgramData\\Anaconda3\\lib\\site-packages')
-sys.path.append('C:\\ProgramData\\Anaconda3\\lib\\site-packages\\IPython\\extensions')
-
-from colorit import *
+try:
+    from colorit import *
+except:
+    print("Colorit is not installed. Please install color-it through the command pip install color-it")
+    input("")
 
 # Use this to ensure that ColorIt will be usable by certain command line interfaces
 init_colorit()

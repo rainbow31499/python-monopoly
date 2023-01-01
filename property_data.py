@@ -6,6 +6,7 @@ init_colorit()
 class Square:
     def __init__(self,name):
         self.name = name
+        self.position = None
         
 class Property(Square):
     def __init__(self,name,price,mortgage):
@@ -26,6 +27,10 @@ class Property(Square):
             print('You unmortgaged {} for ${}'.format(self.name,unmortgage_value))
             self.mortgaged = False
 
+    def mortgageable(self):
+        # Test if property is mortgageable (all railroads and utilites are mortgageable)
+        return True
+
 class Land(Property):
     def __init__(self,name,color,price,rents,house_price,mortgage):
         super().__init__(name,price,mortgage)
@@ -39,11 +44,22 @@ class Land(Property):
         return LAND_COLORS[self.color]
     
     def full_set_owned(self):
-        # Test if player owns all properties in the same set as current
-        for prop in LAND_COLORS[self.color]:
+        # Test if player owns all properties in the same set as current (to check if double rent applies)
+        for prop in self.full_set():
             if prop.owner != self.owner:
                 return False
         return True
+
+    def house_buildable(self):
+        # Test if houses can be built on the property (full set must be owned by same player and not be mortgaged)
+        if self.full_set_owned() and not any([prop.mortgaged for prop in self.full_set()]):
+            return True
+        else:
+            False
+
+    def mortgageable(self):
+        # Test if property is mortgageable (must not have any houses on the color)
+        return not any([prop.houses for prop in self.full_set()])
     
     def get_rent(self):
         if self.houses == 0 and self.full_set_owned() == True:
@@ -265,6 +281,9 @@ BOARD = {0: Square('Go'),
          37: LAND_COLORS['blue'][0],
          38: Square('Luxury Tax'),
          39: LAND_COLORS['blue'][1]}
+
+for square in BOARD:
+    BOARD[square].position = square
 
 BG_COLORS = {'brown': (148,75,33),
              'light blue': (148,224,227),
